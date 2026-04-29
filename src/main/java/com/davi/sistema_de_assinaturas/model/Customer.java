@@ -2,7 +2,6 @@ package com.davi.sistema_de_assinaturas.model;
 
 import com.davi.sistema_de_assinaturas.model.enums.CustomerStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity
 @Table(name = "customers")
 public class Customer {
@@ -40,13 +39,13 @@ public class Customer {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void preUpdate(){
+    public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 }
