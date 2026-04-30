@@ -14,6 +14,8 @@ import com.davi.sistema_de_assinaturas.repository.CustomerRepository;
 import com.davi.sistema_de_assinaturas.repository.PlanRepository;
 import com.davi.sistema_de_assinaturas.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,5 +57,10 @@ public class SubscriptionService {
         Subscription savedSubscription = subscriptionRepository.save(subscription);
 
         return subscriptionMapper.toResponse(savedSubscription);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SubscriptionResponseDTO> getByCustomer(Long customerId, Pageable pageable) {
+        return subscriptionRepository.findAllByCustomerId(customerId, pageable).map(subscriptionMapper::toResponse);
     }
 }
