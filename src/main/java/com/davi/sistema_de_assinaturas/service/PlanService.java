@@ -66,6 +66,7 @@ public class PlanService {
         plan.setName(normalizedName);
         plan.setPrice(dto.price());
         plan.setMaxProjects(dto.maxProjects());
+        plan.setBillingCycle(dto.billingCycle());
 
         return mapper.toResponse(plan);
     }

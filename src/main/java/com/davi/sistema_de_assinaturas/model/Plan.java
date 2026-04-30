@@ -1,5 +1,6 @@
 package com.davi.sistema_de_assinaturas.model;
 
+import com.davi.sistema_de_assinaturas.model.enums.BillingCycle;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,10 @@ public class Plan {
 
     @Column(name = "max_projects")
     private Integer maxProjects;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "billing_cycle", nullable = false, length = 30)
+    private BillingCycle billingCycle;
 
     @Column(nullable = false)
     private Boolean active = true;

@@ -1,0 +1,5 @@
+ALTER TABLE plans
+    ADD COLUMN billing_cycle VARCHAR(30) NOT NULL DEFAULT 'MONTHLY';
+
+ALTER TABLE plans
+    ALTER COLUMN billing_cycle DROP DEFAULT;
