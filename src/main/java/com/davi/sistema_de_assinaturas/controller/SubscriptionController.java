@@ -30,4 +30,11 @@ public class SubscriptionController {
 
         return ResponseEntity.ok(subscriptionService.getByCustomer(customerId, pageable));
     }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable Long id) {
+        subscriptionService.cancel(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

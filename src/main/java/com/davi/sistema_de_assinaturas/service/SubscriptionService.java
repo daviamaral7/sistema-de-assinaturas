@@ -61,6 +61,18 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true)
     public Page<SubscriptionResponseDTO> getByCustomer(Long customerId, Pageable pageable) {
+        customerRepository.findByIdAndStatusNot(customerId, CustomerStatus.DELETED)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+
         return subscriptionRepository.findAllByCustomerId(customerId, pageable).map(subscriptionMapper::toResponse);
+    }
+
+    public void cancel(Long id) {
+        Subscription subscription = subscriptionRepository
+                .findByIdAndStatus(id, SubscriptionStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Active subscription not found"));
+
+        subscription.setStatus(SubscriptionStatus.CANCELED);
+        subscription.setEndDate(LocalDate.now());
     }
 }

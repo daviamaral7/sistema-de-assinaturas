@@ -6,10 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
     boolean existsByCustomerIdAndStatus(Long customerId, SubscriptionStatus status);
 
     Page<Subscription> findAllByCustomerId(Long customerId, Pageable pageable);
 
+    Optional<Subscription> findByIdAndStatus(Long id, SubscriptionStatus subscriptionStatus);
 }
