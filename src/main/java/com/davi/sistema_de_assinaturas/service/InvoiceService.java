@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -79,5 +80,16 @@ public class InvoiceService {
 
         Subscription subscription = invoice.getSubscription();
         subscription.setStatus(SubscriptionStatus.PAST_DUE);
+    }
+
+    public void automaticallyMarkAllOverdue() {
+        List<Invoice> invoices = invoiceRepository.findAllByStatusAndDueDateBefore(InvoiceStatus.OPEN, LocalDate.now());
+
+        for (Invoice invoice : invoices) {
+            invoice.setStatus(InvoiceStatus.OVERDUE);
+
+            Subscription subscription = invoice.getSubscription();
+            subscription.setStatus(SubscriptionStatus.PAST_DUE);
+        }
     }
 }
