@@ -11,6 +11,8 @@ import com.davi.sistema_de_assinaturas.model.enums.SubscriptionStatus;
 import com.davi.sistema_de_assinaturas.repository.InvoiceRepository;
 import com.davi.sistema_de_assinaturas.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +27,9 @@ public class InvoiceService {
     private final SubscriptionRepository subscriptionRepository;
     private final InvoiceMapper invoiceMapper;
 
-    public InvoiceResponseDTO generate (Long id) {
+    public InvoiceResponseDTO generate(Long id) {
         Subscription subscription = subscriptionRepository.findByIdAndStatus(id, SubscriptionStatus.ACTIVE)
-                .orElseThrow(()->new ResourceNotFoundException("Active subscription not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Active subscription not found"));
 
         LocalDate dueDate = subscription.getNextBillingDate();
 
@@ -46,5 +48,36 @@ public class InvoiceService {
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
         return invoiceMapper.toResponse(savedInvoice);
+    }
+
+    @Transactional(readOnly = true)
+    public InvoiceResponseDTO getInvoiceById(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
+
+        return invoiceMapper.toResponse(invoice);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<InvoiceResponseDTO> getInvoicesBySubscription(Long id, Pageable pageable) {
+        return invoiceRepository.findAllBySubscriptionId(id, pageable).map(invoiceMapper::toResponse);
+    }
+
+    public void markOverdue(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
+
+        if (invoice.getStatus() != InvoiceStatus.OPEN) {
+            throw new InvalidBusinessRuleException("Only OPEN invoices can become OVERDUE");
+        }
+
+        if (!invoice.getDueDate().isBefore(LocalDate.now())) {
+            throw new InvalidBusinessRuleException("Invoice is not overdue yet");
+        }
+
+        invoice.setStatus(InvoiceStatus.OVERDUE);
+
+        Subscription subscription = invoice.getSubscription();
+        subscription.setStatus(SubscriptionStatus.PAST_DUE);
     }
 }
