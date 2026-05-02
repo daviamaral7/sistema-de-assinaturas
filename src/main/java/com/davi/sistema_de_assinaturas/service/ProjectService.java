@@ -33,7 +33,8 @@ public class ProjectService {
         Customer customer = customerRepository.findByIdAndStatusNot(dto.customerId(), CustomerStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Subscription subscription = subscriptionRepository.findByCustomerIdAndStatus(customer.getId(), SubscriptionStatus.ACTIVE)
+        Subscription subscription = subscriptionRepository
+                .findByCustomerIdAndStatus(customer.getId(), SubscriptionStatus.ACTIVE)
                 .orElseThrow(() -> new InvalidBusinessRuleException("Customer has no active subscription"));
 
         Integer maxProjects = subscription.getPlan().getMaxProjects();
@@ -64,5 +65,37 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public Page<ProjectResponseDTO> getProjectsByCustomerId(Long id, Pageable pageable) {
         return projectRepository.findAllByCustomerId(id, pageable).map(mapper::toResponse);
+    }
+
+    public void deactivate(Long id) {
+        Project project = projectRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Active project not found"));
+
+        project.setActive(false);
+    }
+
+    public ProjectResponseDTO activate(Long id) {
+        Project project = projectRepository.findByIdAndActiveFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Inactive project not found"));
+
+        Long customerId = project.getCustomer().getId();
+
+        Subscription subscription = subscriptionRepository
+                .findByCustomerIdAndStatus(customerId, SubscriptionStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer has no active subscription"));
+
+        Integer maxProjects = subscription.getPlan().getMaxProjects();
+
+        if (maxProjects != null) {
+            long count = projectRepository.countByCustomerIdAndActiveTrue(customerId);
+
+            if (count >= maxProjects) {
+                throw new InvalidBusinessRuleException("Project limit reached for this plan");
+            }
+        }
+
+        project.setActive(true);
+
+        return mapper.toResponse(project);
     }
 }

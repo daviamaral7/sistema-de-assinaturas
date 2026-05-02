@@ -33,7 +33,21 @@ public class ProjectController {
     }
 
     @GetMapping("/customers/{id}")
-    public ResponseEntity<Page<ProjectResponseDTO>> getProjectsByCustomerId (@PathVariable Long id, Pageable pageable){
+    public ResponseEntity<Page<ProjectResponseDTO>> getProjectsByCustomerId(@PathVariable Long id, Pageable pageable) {
         return ResponseEntity.ok(projectService.getProjectsByCustomerId(id, pageable));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+        projectService.deactivate(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<ProjectResponseDTO> activate(@PathVariable Long id) {
+        ProjectResponseDTO response = projectService.activate(id);
+
+        return ResponseEntity.ok(response);
     }
 }

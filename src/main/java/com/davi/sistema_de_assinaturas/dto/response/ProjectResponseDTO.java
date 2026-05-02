@@ -7,6 +7,7 @@ public record ProjectResponseDTO(
         Long customerId,
         String customerName,
         String name,
+        String status,
         LocalDateTime createdAt
 ) {
 }

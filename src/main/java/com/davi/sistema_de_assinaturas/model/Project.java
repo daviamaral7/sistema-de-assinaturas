@@ -25,6 +25,9 @@ public class Project {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(nullable = false)
+    private Boolean active = true;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

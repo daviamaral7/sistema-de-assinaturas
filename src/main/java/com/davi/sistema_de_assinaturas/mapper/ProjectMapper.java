@@ -10,5 +10,6 @@ public interface ProjectMapper {
 
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", source = "customer.name")
+    @Mapping(target = "status", expression = "java(project.getActive() ? \"ACTIVE\" : \"INACTIVE\")")
     ProjectResponseDTO toResponse(Project project);
 }
