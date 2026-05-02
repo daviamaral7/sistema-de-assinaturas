@@ -14,6 +14,8 @@ import com.davi.sistema_de_assinaturas.repository.CustomerRepository;
 import com.davi.sistema_de_assinaturas.repository.ProjectRepository;
 import com.davi.sistema_de_assinaturas.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,5 +51,18 @@ public class ProjectService {
         project.setName(dto.name());
 
         return mapper.toResponse(projectRepository.save(project));
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectResponseDTO getProjectById(Long id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        return mapper.toResponse(project);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProjectResponseDTO> getProjectsByCustomerId(Long id, Pageable pageable) {
+        return projectRepository.findAllByCustomerId(id, pageable).map(mapper::toResponse);
     }
 }

@@ -6,11 +6,10 @@ import com.davi.sistema_de_assinaturas.service.ProjectService;
 import com.davi.sistema_de_assinaturas.util.ControllerUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +23,17 @@ public class ProjectController {
         ProjectResponseDTO response = projectService.create(dto);
 
         return ResponseEntity.created(ControllerUtils.createHeaderLocation(response.id())).body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectResponseDTO> getProjectById(@PathVariable Long id) {
+        ProjectResponseDTO response = projectService.getProjectById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/customers/{id}")
+    public ResponseEntity<Page<ProjectResponseDTO>> getProjectsByCustomerId (@PathVariable Long id, Pageable pageable){
+        return ResponseEntity.ok(projectService.getProjectsByCustomerId(id, pageable));
     }
 }
