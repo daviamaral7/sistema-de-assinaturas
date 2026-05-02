@@ -29,10 +29,10 @@ public class PaymentService {
 
     public PaymentResponseDTO pay(PaymentRequestDTO dto) {
         Invoice invoice = invoiceRepository.findById(dto.invoiceId())
-                .orElseThrow(() -> new InvalidBusinessRuleException("Invoice not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
         if (invoice.getStatus() != InvoiceStatus.OPEN && invoice.getStatus() != InvoiceStatus.OVERDUE) {
-            throw new ResourceNotFoundException("Invoice cannot be paid");
+            throw new InvalidBusinessRuleException("Invoice cannot be paid");
         }
 
         if (dto.amount().compareTo(invoice.getAmount()) != 0) {

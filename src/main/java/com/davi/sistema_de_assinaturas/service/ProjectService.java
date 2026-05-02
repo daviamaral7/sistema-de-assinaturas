@@ -40,7 +40,7 @@ public class ProjectService {
         Integer maxProjects = subscription.getPlan().getMaxProjects();
 
         if (maxProjects != null) {
-            long count = projectRepository.countByCustomerId(customer.getId());
+            long count = projectRepository.countByCustomerIdAndActiveTrue(customer.getId());
 
             if (count >= maxProjects) {
                 throw new InvalidBusinessRuleException("Project limit reached for this plan");
